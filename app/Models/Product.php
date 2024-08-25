@@ -15,9 +15,9 @@ class Product extends Model implements ModelsPermission, RedisKey
     protected $fillable = [
         'name',
         'slug',
-        'descrption',
+        'description',
         'price',
-        'cover_path',
+        'cover',
         'admin_id',
         'website_id',
         'category_id',

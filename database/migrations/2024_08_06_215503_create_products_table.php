@@ -14,12 +14,12 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('slug');
-            $table->longText('descrption');
+            $table->longText('description');
             $table->decimal('price', 10, 2);
             $table->foreignId('admin_id')->constrained('admins');
             $table->foreignId('website_id')->constrained('websites');
             $table->foreignId('category_id')->constrained('categories');
-            $table->string('cover_path');
+            $table->string('cover');
             $table->boolean('is_new')->default(false);
             $table->boolean('is_special')->default(false);
             $table->softDeletes();

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Website\Admin\Catalog;
 
+use App\Enums\RedisWebsiteProperty;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Website\Admin\RedisController;
 use App\Jobs\ProductJob;
+use App\Models\Category;
+use App\Models\Website;
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\product;
@@ -28,73 +32,53 @@ class ProductController extends Controller
      * Show the form for creating a new Product.
      * @return \Illuminate\View\View
      */
-    public function create()
+    public function create($website)
     {
-        ;
-        return view("website.admin.catalog.product.create");
+        if (!Auth::guard('admins')->user()->can('create', [Product::class, $website])) {
+            abort(403, 'Unauthorized action');
+        }
+        $website_id = RedisController::hget(
+            Website::firstKey($website),
+            Website::secondKey(RedisWebsiteProperty::website_id),
+            fn() => get_website_id($website),
+        );
+        $categories = RedisController::hgetall(
+            Category::firstKey($website),
+            fn() => get_categories_models($website_id),
+        );
+        return view("website.admin.catalog.product.create", compact('website', 'categories'));
     }
 
     /**
      * Store a newly created Product in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $website)
     {
+        if (!Auth::guard('admins')->user()->can('create', [Product::class, $website])) {
+            abort(403, 'Unauthorized action');
+        }
+        // dd($request->all());
         $data = $request->validate([
-            'name' => ['required', 'string', 'max255'],
+            'name' => ['required', 'string'],
             'slug' => ['required', 'string'],
-            'discription' => ['required', 'string'],
+            'description' => ['required', 'string'],
             'price' => ['required', 'numeric'],
-            'admin_id' => ['required', 'numeric'],
-            'website_id' => ['required', 'numeric'],
-            'category_id' => ['required', 'numeric'],
-            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            'images.*' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'cover' => ['required'],
+            'category_id' => ['required'],
+            //todo Handling images
+            // 'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            // 'images.*' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
-
-
-        $destinationPath = public_path('images\products');
-        if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0755, true);
-        }
-        $imageName = '';
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $data['slug'] . '_' . rand(100, 999) . '_' . '.' . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $imageName);
-        } else {
-            return back()->with('error', 'can\'t upload images');
-        }
-
-        $product = new Product();
-        $product->title = $data['name'];
-        $product->slug = $data['slug'];
-        $product->description = $data['description'];
-        $product->price = $data['price'];
-        $product->category_id = $data['admin_id'];
-        $product->category_id = $data['website_id'];
-        $product->category_id = $data['category_id'];
-        $product->image = $imageName;
-        $product->is_new = array_key_exists('is_new', $data) ? $data['is_new'] : 0;
-        $product->is_special = array_key_exists('is_special', $data) ? $data['is_special'] : 0;
-        $product->save();
-
-
-        if ($request->hasFile('images')) {
-            $counter = 0;
-            foreach ($request->file('images') as $image) {
-                $name = time() . '_' . $request->slug . '_'
-                    . $counter . '_' . rand(1, 100) . '.' .
-                    $image->getClientOriginalExtension();
-                $image->move($destinationPath, $name);
-                $counter++;
-                $product->images()->create([
-                    'path' => $name,
-                ]);
-            }
-        }
-        dispatch(new ProductJob($product->id));
-
-        return redirect()->route('website.admin.product.index')->with('success', 'product has been created');
+        $website_id = RedisController::hget(
+            Website::firstKey($website),
+            Website::secondKey(RedisWebsiteProperty::website_id),
+            fn() => get_website_id($website),
+        );
+        $data['website_id'] = $website_id;
+        $data['admin_id'] = Auth::guard('admins')->user()->id;
+        // dd($data);
+        Product::create($data);
+        return redirect()->route('website.admin.catalog.product.index', ['website' => $website])->with('success', 'product has been created');
 
     }
 
