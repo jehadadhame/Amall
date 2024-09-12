@@ -48,9 +48,9 @@ class Product extends Model implements ModelsPermission, RedisKey
     {
         return $this->hasMany('reviews');
     }
-    public function images()
+    public function media()
     {
-        return $this->hasMany('images');
+        return $this->morphToMany(Media::class, 'mediaable');
     }
     public function carts()
     {

@@ -52,7 +52,7 @@ class AdminLoginController extends Controller
             // dd(['loged in successfuly', $credentials]);
             return redirect()->intended(route('website.admin.dashboard', ['website' => $website]));
         }
-        dd(['cant loged in', $credentials]);
+        dd(['can\'t logged in', $credentials]);
         return back()->with('error', 'email or password');
     }
 

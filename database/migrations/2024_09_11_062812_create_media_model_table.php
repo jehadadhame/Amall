@@ -10,10 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('images', function (Blueprint $table) {
+        Schema::create('media_model', function (Blueprint $table) {
             $table->id();
-            $table->string('path');
-            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('media_id');
+            $table->morphs('mediaable');
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('images');
+        Schema::dropIfExists('media_model');
     }
 };

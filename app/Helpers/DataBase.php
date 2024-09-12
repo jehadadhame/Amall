@@ -4,7 +4,7 @@ use App\Models\Category;
 /**
  * Summary of get_website_id
  * @param string $website slug
- * @return int website_id 
+ * @return int website_id p
  */
 function get_website_id($website): int
 {

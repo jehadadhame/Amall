@@ -23,14 +23,16 @@ class ProductController extends Controller
         if (!Auth::guard('admins')->user()->can('viewAny', [Product::class, $website])) {
             abort(403, 'Unauthorized action');
         }
+        $title = 'create product';
+        $btnName = 'create';
         $i = 0;
         $products = Product::get()->forPage($i, 25);
-        return view("website.admin.catalog.product.index", compact(["products", 'website']));
+        return view("website.admin.catalog.product.index", compact(["products", 'website', 'title', 'btnName']));
     }
 
     /**
      * Show the form for creating a new Product.
-     * @return \Illuminate\View\View
+    //  * @return \Illuminate\View\View
      */
     public function create($website)
     {
@@ -46,7 +48,12 @@ class ProductController extends Controller
             Category::firstKey($website),
             fn() => get_categories_models($website_id),
         );
-        return view("website.admin.catalog.product.create", compact('website', 'categories'));
+        // return view("website.admin.catalog.product.create", compact('website', 'categories'), ['test' => 'test']);
+        return response()->json([
+            'html' => view("website.admin.catalog.product.create", compact('website', 'categories'), ['test' => 'test'])->render(),
+            'css' => '\css\admin\product\create.css',
+            'js' => '\js\admin\product\create.js',
+        ]);
     }
 
     /**
@@ -57,18 +64,22 @@ class ProductController extends Controller
         if (!Auth::guard('admins')->user()->can('create', [Product::class, $website])) {
             abort(403, 'Unauthorized action');
         }
-        // dd($request->all());
-        $data = $request->validate([
+        $req = validator($request->all(), [
             'name' => ['required', 'string'],
             'slug' => ['required', 'string'],
             'description' => ['required', 'string'],
             'price' => ['required', 'numeric'],
             'cover' => ['required'],
             'category_id' => ['required'],
-            //todo Handling images
-            // 'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-            // 'images.*' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
+        if ($req->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $req->errors(),
+            ]);
+        }
+
+        $data = $req->validated();
         $website_id = RedisController::hget(
             Website::firstKey($website),
             Website::secondKey(RedisWebsiteProperty::website_id),
@@ -78,7 +89,10 @@ class ProductController extends Controller
         $data['admin_id'] = Auth::guard('admins')->user()->id;
         // dd($data);
         Product::create($data);
-        return redirect()->route('website.admin.catalog.product.index', ['website' => $website])->with('success', 'product has been created');
+        return response()->json([
+            'success' => true,
+        ]);
+        // return redirect()->route('website.admin.catalog.product.index', ['website' => $website])->with('success', 'product has been created');
 
     }
 

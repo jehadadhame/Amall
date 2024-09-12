@@ -4,6 +4,7 @@ use App\Http\Controllers\Website\Admin\RedisController;
 use App\Models\Category;
 use App\Models\Website;
 use Illuminate\Support\Facades\Route;
+use Kunnu\Dropbox\DropboxApp;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,10 +150,27 @@ Route::group(["prefix" => "merchant"], function () {
     });
 });
 
-
+use App\Models\Media;
+use Symfony\Component\HttpFoundation\File\File;
+use Kunnu\Dropbox\Dropbox;
 Route::get('/', function () {
-
-
-    $website = Website::find(1)->first()->name;
-    dd($website);
+    $filepath = public_path('2.jpg');
+    $file = new File($filepath);
+    // echo $file->getFilename();
+    // echo '<br>';
+    // echo $file->getMimeType();
+    // echo '<br>';
+    // echo $file->getSize();
+    // echo '<br>';
+    // // dd($file);
+    // Media::addMedia($file, 'demo');
+    $app = new DropboxApp(
+        'gcdfiv31wl3sqk4',
+        '90vrpbs07rzdohk',
+        'sl.B8xNfIoADRqFnSYxr8Xhr5OgzAoXh2zVdFUhISXhTtzB3PbsunYGsvqKN9YVCdx-gsLuENl0_3gOstFs__09TrG9l1OkPuFCY6oyVlzeDZglN7LUU_P9UFKqGsfHnVaESkLjQf5u7YcM7kcpaBc6idg',
+    );
+    $dropbox = new Dropbox($app);
+    $fileMetaData = $dropbox->upload($file, '/App');
+    $listFolderContents = $dropbox->listFolder("/");
+    dd([$fileMetaData, $listFolderContents]);
 });
