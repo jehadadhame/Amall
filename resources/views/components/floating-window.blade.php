@@ -21,7 +21,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
             display: none;
-            z-index: 999;
+            z-index: 3;
             backdrop-filter: blur(5px);
             /* Applies blur to the background */
         }
@@ -32,15 +32,15 @@
             left: 50%;
             transform: translate(-50%, -50%);
             /* Centers the window */
-            width: auto;
-            height: auto;
+            width: 500px;
+            height: 500px;
             background-color: white;
             border: 1px solid #ccc;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 10px;
             display: none;
             /* Initially hidden */
-            z-index: 1000;
+            z-index: 5;
             overflow: hidden;
         }
 

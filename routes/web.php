@@ -174,3 +174,7 @@ Route::get('/', function () {
     $listFolderContents = $dropbox->listFolder("/");
     dd([$fileMetaData, $listFolderContents]);
 });
+
+Route::get('route/', function () {
+    dd(date("d M Y H:i:s.", filemtime(public_path('css/admin/product/index.css'))));
+});

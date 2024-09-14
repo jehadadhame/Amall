@@ -44,16 +44,17 @@ class ProductController extends Controller
             Website::secondKey(RedisWebsiteProperty::website_id),
             fn() => get_website_id($website),
         );
+
         $categories = RedisController::hgetall(
             Category::firstKey($website),
             fn() => get_categories_models($website_id),
         );
-        // return view("website.admin.catalog.product.create", compact('website', 'categories'), ['test' => 'test']);
-        return response()->json([
-            'html' => view("website.admin.catalog.product.create", compact('website', 'categories'), ['test' => 'test'])->render(),
-            'css' => '\css\admin\product\create.css',
-            'js' => '\js\admin\product\create.js',
-        ]);
+        return view("website.admin.catalog.product.create", compact('website', 'categories'), ['test' => 'test']);
+        // return response()->json([
+        //     'html' => view("website.admin.catalog.product.create", compact('website', 'categories'))->render(),
+        //     'css' => '\css\admin\product\create.css',
+        //     'js' => '\js\admin\product\create.js',
+        // ]);
     }
 
     /**

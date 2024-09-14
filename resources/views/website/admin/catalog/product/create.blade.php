@@ -1,3 +1,20 @@
+@extends('website.admin.layouts.master')
+
+@push('css')
+    <link rel="stylesheet"
+        href="{{asset('css\admin\product\create.css')}}?v ={{filemtime(public_path('css/admin/product/create.css'))}}">
+@endpush
+
+@section('title')
+Products
+@endsection
+
+
+@push('js')
+    <script src={{asset("js\admin\product\index.js")}}></script>
+@endpush
+
+@section('content')
 <div>
     <form id="create-product" name="create-product"
         action="{{route('website.admin.catalog.product.store', ['website' => $website])}}" method="POST">
@@ -58,4 +75,4 @@
         <button id="creatProductBtn">Create</button>
     </form>
 </div>
-<script src="js\admin\product\create.js"></script>
+@endsection

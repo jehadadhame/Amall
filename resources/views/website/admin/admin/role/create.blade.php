@@ -1,8 +1,21 @@
-<html>
+@extends('website.admin.layouts.master')
 
-<head></head>
+@push('css')
+    <link rel="stylesheet"
+        href="{{asset('css\admin\product\create.css')}}?v ={{filemtime(public_path('css/admin/product/index.css'))}}">
+@endpush
 
-<body>
+@section('title')
+Products
+@endsection
+
+
+@push('js')
+    <script src={{asset("js\admin\product\index.js")}}></script>
+@endpush
+
+@section('content')
+<div class="create_container">
     <form action="{{route('website.admin.admins.role.store', ['website' => $website])}}" method="Post">
         @csrf
 
@@ -41,19 +54,5 @@
         <br>
         <input type="submit" value="create">
     </form>
-    <script>
-        var checkall = document.getElementById('check_all');
-
-        checkall.addEventListener('click', function (event) {
-            event.preventDefault();
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(function (checkbox) {
-                checkbox.checked = true;
-            });
-        });
-
-
-    </script>
-</body>
-
-</html>
+</div>
+@endsection
